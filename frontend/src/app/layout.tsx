@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Gridlock | Traffic Violation System",
-  description: "Next-gen automated traffic violation detection and reporting system.",
+  title: "TrafficEye — AI Traffic Violation Detection",
+  description: "Upload traffic footage or photos. YOLOv8x + EasyOCR detects helmets, red lights, wrong-side driving and reads license plates automatically.",
 };
 
 export default function RootLayout({

@@ -1,47 +1,42 @@
-import { Camera, Violation } from '../types/api';
+import { DetectionResult } from '../types/api';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  'https://traffic-violation-api-660444655892.asia-south1.run.app';
 
-export async function fetchCameras(): Promise<Camera[]> {
-  const response = await fetch(`${API_BASE_URL}/api/cameras`);
-  if (!response.ok) throw new Error('Failed to fetch cameras');
-  return response.json();
+const VIDEO_EXTS = /\.(mp4|avi|mkv|mov|m4v)$/i;
+
+function isVideoFile(file: File): boolean {
+  return file.type.startsWith('video/') || VIDEO_EXTS.test(file.name);
 }
 
-export async function fetchViolations(): Promise<Violation[]> {
-  const response = await fetch(`${API_BASE_URL}/api/violations`);
-  if (!response.ok) throw new Error('Failed to fetch violations');
-  return response.json();
-}
-
-export async function fetchStats(): Promise<{
-  total_violations: number;
-  active_cameras: number;
-  pending_reviews: number;
-}> {
-  const response = await fetch(`${API_BASE_URL}/api/stats`);
-  if (!response.ok) throw new Error('Failed to fetch stats');
-  return response.json();
-}
-
-export async function uploadAndAnalyzeFile(file: File): Promise<{
-  violations: Violation[];
-  summary: {
-    total_detected: number;
-    high_confidence_count: number;
-    estimated_fines: number;
-  };
-  gcp_url: string;
-}> {
+/**
+ * Upload image → POST /api/v1/detect/image/full  (JSON + annotated image b64)
+ * Upload video → POST /api/v1/detect/video        (violation report JSON)
+ */
+export async function uploadAndAnalyzeFile(
+  file: File,
+  cameraId: string = 'CAM-01',
+  maxFrames?: number,
+): Promise<DetectionResult> {
   const formData = new FormData();
   formData.append('file', file);
 
-  const response = await fetch(`${API_BASE_URL}/api/v1/detect`, {
-    method: 'POST',
-    body: formData,
-  });
+  let url: string;
+  if (isVideoFile(file)) {
+    url = `${API_BASE_URL}/api/v1/detect/video?camera_id=${encodeURIComponent(cameraId)}&skip_frames=2`;
+    if (maxFrames) url += `&max_frames=${maxFrames}`;
+  } else {
+    url = `${API_BASE_URL}/api/v1/detect/image/full?camera_id=${encodeURIComponent(cameraId)}`;
+  }
 
-  if (!response.ok) throw new Error('Inference or upload to GCP failed');
+  const response = await fetch(url, { method: 'POST', body: formData });
+
+  if (!response.ok) {
+    const errText = await response.text().catch(() => response.statusText);
+    throw new Error(`Detection failed (${response.status}): ${errText}`);
+  }
+
   return response.json();
 }
 
