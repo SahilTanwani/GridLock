@@ -1,0 +1,172 @@
+@import "tailwindcss";
+
+:root {
+  --background: #FFFFFF;
+  --foreground: #0F172A;
+  
+  /* Neutral Tokens */
+  --neutral-primary-soft: #FFFFFF;
+  --neutral-secondary-soft: #F8FAFB;
+  --neutral-secondary-medium: #F8FAFB;
+  --neutral-tertiary-medium: #F0F3F5;
+  
+  /* Brand Tokens */
+  --brand: #0EA66D;
+  --brand-soft: #B8FFD9;
+  --brand-softer: #E6FFF3;
+  --brand-strong: #087A4E;
+  
+  /* Status Tokens */
+  --success: #007A55;
+  --success-soft: #ECFDF5;
+  --danger: #C70036;
+  --danger-soft: #FEF0F2;
+  --warning: #F97316;
+  --warning-soft: #FFF7ED;
+  
+  /* Text Tokens */
+  --heading: #0F172A;
+  --body: #475569;
+  --body-subtle: #64748B;
+  
+  /* Glass Surface Tokens */
+  --glass-bg: rgba(255, 255, 255, 0.45);
+  --glass-bg-hover: rgba(255, 255, 255, 0.55);
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --glass-border-subtle: rgba(0, 0, 0, 0.05);
+  --glass-blur: blur(20px);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.6), inset 0 -1px 0 rgba(255, 255, 255, 0.15);
+  --glass-edge-top: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+  --glass-edge-left: linear-gradient(180deg, rgba(255,255,255,0.5), transparent, rgba(255,255,255,0.2));
+  
+  /* Button Glint */
+  --color-1-400: rgba(255,255,255,0.30);
+  --color-1-700: rgba(0,0,0,0.08);
+  
+  --shadow-xs: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --radius-base: 20px;
+  --radius-default: 12px;
+  --radius-sm: 8px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #060A12;
+    --foreground: #F0F6FC;
+    
+    --neutral-primary-soft: #0B0F19;
+    --neutral-secondary-soft: #060A12;
+    --neutral-secondary-medium: #141C2E;
+    --neutral-tertiary-medium: #1E293B;
+    
+    --brand: #8AFFC4;
+    --brand-soft: #0C3927;
+    --brand-softer: #071F16;
+    --brand-strong: #6BEFAB;
+    
+    --success: #009966;
+    --success-soft: #002C22;
+    --danger: #C70036;
+    --danger-soft: #4D0218;
+    --warning: #F97316;
+    --warning-soft: #7C2D12;
+    
+    --heading: #F0F6FC;
+    --body: #94A3B8;
+    --body-subtle: #94A3B8;
+    
+    --glass-bg: rgba(255, 255, 255, 0.1);
+    --glass-bg-hover: rgba(255, 255, 255, 0.15);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --glass-border-subtle: rgba(255, 255, 255, 0.06);
+    --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.5), inset 0 -1px 0 rgba(255, 255, 255, 0.1);
+    --glass-edge-top: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    --glass-edge-left: linear-gradient(180deg, rgba(255,255,255,0.2), transparent, rgba(255,255,255,0.05));
+    
+    --color-1-400: rgba(255,255,255,0.15);
+    --color-1-700: rgba(0,0,0,0.20);
+  }
+}
+
+@theme {
+  --color-brand: var(--brand);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-softer: var(--brand-softer);
+  --color-brand-strong: var(--brand-strong);
+  
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  
+  --color-heading: var(--heading);
+  --color-body: var(--body);
+  --color-body-subtle: var(--body-subtle);
+  
+  --color-glass-bg: var(--glass-bg);
+  --color-glass-bg-hover: var(--glass-bg-hover);
+  --color-glass-border: var(--glass-border);
+  --color-glass-border-subtle: var(--glass-border-subtle);
+  
+  --radius-base: var(--radius-base);
+  --radius-default: var(--radius-default);
+  --radius-sm: var(--radius-sm);
+  
+  --shadow-glass: var(--glass-shadow);
+  --shadow-xs: var(--shadow-xs);
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), sans-serif;
+  min-height: 100vh;
+}
+
+.glass-surface {
+  background-color: var(--glass-bg);
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  overflow: hidden;
+}
+
+.glass-surface::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--glass-edge-top);
+  pointer-events: none;
+}
+
+.glass-surface::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 100%;
+  background: var(--glass-edge-left);
+  pointer-events: none;
+}
+
+/* Glint effect for buttons */
+.glint-effect {
+  box-shadow: var(--shadow-xs), inset var(--color-1-400) 0 6px 0px -5px, var(--color-1-700) 0 4px 10px -5px;
+}
+
+.heading-h1 { font-size: 60px; line-height: 1; letter-spacing: -0.8px; font-weight: 500; color: var(--heading); }
+.heading-h2 { font-size: 44px; line-height: 1.15; font-weight: 500; color: var(--heading); }
+.heading-h3 { font-size: 36px; line-height: 1.2; font-weight: 500; color: var(--heading); }
+
+@media (max-width: 768px) {
+  .heading-h1 { font-size: 40px; }
+  .heading-h2 { font-size: 36px; }
+  .heading-h3 { font-size: 30px; }
+}
