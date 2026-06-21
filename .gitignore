@@ -37,6 +37,15 @@ coverage/
 Thumbs.db
 *.pem
 
+# Local specific credentials
+*a0d56b304a06.json
+*.json
+
+# Design System & Documentation
+glassmorphism-design-system/
+mockflow-apple-liquid-glass/
+glassmorphism.md
+
 # Logs
 *.log
 npm-debug.log*

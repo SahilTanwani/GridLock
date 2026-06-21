@@ -1,11 +1,21 @@
 from fastapi import FastAPI
-import asyncio
+from fastapi.middleware.cors import CORSMiddleware
+from app.api.endpoints import router as api_router
 
 # Create the FastAPI application instance
 app = FastAPI(
     title="Traffic Violation System API",
     description="API for automated traffic violation detection using YOLOv8 and EasyOCR",
     version="1.0.0"
+)
+
+# Configure CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # For development only
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 @app.get("/health")
@@ -17,6 +27,6 @@ def health_check():
 def read_root():
     return {"message": "Traffic Violation System API is running"}
 
-# In the future, include routers here:
-# from app.api.endpoints import my_router
-# app.include_router(my_router, prefix="/api")
+# Include the API router
+app.include_router(api_router, prefix="/api")
+

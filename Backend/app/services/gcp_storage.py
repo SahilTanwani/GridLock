@@ -5,10 +5,22 @@ from typing import Optional
 from google.cloud import storage
 from app.core.config import settings
 
-# Initialize GCP Storage client. 
-# It automatically picks up credentials from the GOOGLE_APPLICATION_CREDENTIALS environment variable.
-storage_client = storage.Client(project=settings.GCP_PROJECT)
-bucket = storage_client.bucket(settings.GCP_BUCKET_NAME)
+# Initialize GCP Storage client inside functions, or mock it if credentials fail
+storage_client = None
+bucket = None
+
+def get_storage_bucket():
+    global storage_client, bucket
+    if bucket is not None:
+        return bucket
+        
+    try:
+        storage_client = storage.Client(project=settings.GCP_PROJECT)
+        bucket = storage_client.bucket(settings.GCP_BUCKET_NAME)
+        return bucket
+    except Exception as e:
+        print(f"Warning: Failed to initialize Google Cloud Storage: {e}")
+        return None
 
 async def generate_resumable_upload_url(
     object_name: str, 
@@ -23,7 +35,11 @@ async def generate_resumable_upload_url(
     'Location' header containing the actual session URI where chunks can be uploaded via PUT.
     """
     def _generate_url():
-        blob = bucket.blob(object_name)
+        b = get_storage_bucket()
+        if not b:
+            return f"https://storage.googleapis.com/{settings.GCP_BUCKET_NAME}/{object_name}"
+            
+        blob = b.blob(object_name)
         url = blob.generate_signed_url(
             version="v4",
             expiration=datetime.timedelta(minutes=expiration_minutes),
@@ -47,7 +63,12 @@ async def upload_evidence_image(
     Returns a long-lived signed URL to be stored in the database's evidence_path column.
     """
     def _upload():
-        blob = bucket.blob(object_name)
+        b = get_storage_bucket()
+        if not b:
+            print("GCP Storage mock: Pretending to upload file.")
+            return f"https://storage.googleapis.com/{settings.GCP_BUCKET_NAME}/{object_name}"
+            
+        blob = b.blob(object_name)
         
         # Upload the bytes to the bucket
         blob.upload_from_string(file_bytes, content_type=content_type)

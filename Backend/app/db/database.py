@@ -6,10 +6,13 @@ from app.core.config import settings
 
 Base = declarative_base()
 
-# Initialize Cloud SQL Python Connector object
-connector = Connector()
+# Initialize Cloud SQL Python Connector object only when needed
+connector = None
 
 async def getconn():
+    global connector
+    if connector is None:
+        connector = Connector()
     # Use private IP if specified, else public
     ip_type = IPTypes.PRIVATE if os.environ.get("PRIVATE_IP") else IPTypes.PUBLIC
     
@@ -24,11 +27,11 @@ async def getconn():
     return conn
 
 # Configure database engine
+# Temporarily skipping Connector init so we don't crash when Google Auth is missing locally
 if settings.LOCAL_DATABASE_URL:
-    # Fallback to local database if URL is provided
     engine = create_async_engine(settings.LOCAL_DATABASE_URL, echo=True)
 else:
-    # Use Cloud SQL Python Connector
+    # Use Cloud SQL Python Connector now that we have the proper instance configuration
     engine = create_async_engine(
         "postgresql+asyncpg://",
         async_creator=getconn,
